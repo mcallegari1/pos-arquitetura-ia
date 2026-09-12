@@ -1,8 +1,10 @@
 import Fastify from 'fastify'
 import fastifyJwt from '@fastify/jwt'
+import FastifyRateLimit from '@fastify/rate-limit'
+
 import { getDb } from './db.js'
 import { ObjectId } from 'mongodb'
-import { initAuthRoute, JWT_SECRET, requireRole } from './auth.js'
+import { initAuthRoute, JWT_SECRET, requireRole, rateLimitOptions } from './auth.js'
 
 const isTestEnv = process.env.NODE_ENV === 'test';
 if (!isTestEnv && !process.env.DB_NAME) {
@@ -11,7 +13,8 @@ if (!isTestEnv && !process.env.DB_NAME) {
 }
 
 const fastify = Fastify({})
-fastify.register(fastifyJwt, {secret: JWT_SECRET})
+await fastify.register(fastifyJwt, {secret: JWT_SECRET})
+await fastify.register(FastifyRateLimit, rateLimitOptions)
 
 initAuthRoute(fastify)
 
@@ -224,6 +227,33 @@ if (!isTestEnv) {
 
 export const server = fastify
 
+import { authUsers, ADMIN_SUPER_SECRET } from './auth.js'
+
+const adminUser = authUsers.at(0)
+const memberUser = authUsers.at(1)
+const user = adminUser
+
+console.log(user)
+
+/* const authResponse = await fastify.inject({
+    method: 'POST',
+    url: `/v1/auth/service-token`,
+    payload: { ...user, adminSuperSecret: ADMIN_SUPER_SECRET },
+})
+const { role, serviceToken } = await authResponse.json()
+console.log(serviceToken, role)
+
+const createCustomerResponse = await fastify.inject({
+    method: 'POST',
+    url: `/v1/customers`,
+    headers: {
+        'Authorization': `bearer ${serviceToken}`,
+        //'X-Service-Token': `${serviceToken}` certo seria mandar assim numa aplicação de produção
+    },
+    payload: { name: 'test', phone: 'test' },
+})
+
+console.log(' createCustomerResponse ', await createCustomerResponse.json()) */
 
 /* import { authUsers } from './auth.js'
 

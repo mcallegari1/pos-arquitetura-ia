@@ -100,8 +100,8 @@ describe('API Workflow', () => {
     after(async () => _testServer.close())
 
 
-    describe.skip('POST /v1/auth/service-token', () => {
-        const ADMIN_SUPER_SECRET = 'AM I THE BOSS?'
+    describe('POST /v1/auth/service-token', () => {
+        const ADMIN_SUPER_SECRET = 'my-super-secret-key'
 
         it('should return role and a UUID serviceToken for valid admin credentials', async () => {
             const res = await _testServer.inject({
@@ -149,8 +149,8 @@ describe('API Workflow', () => {
         })
     })
 
-    describe.skip('Service token - API access & rate limiting', () => {
-        const ADMIN_SUPER_SECRET = 'AM I THE BOSS?'
+    describe('Service token - API access & rate limiting', () => {
+        const ADMIN_SUPER_SECRET = 'my-super-secret-key'
 
         it(`should allow API access and rate limit after ${REQUESTS_PER_MINUTE} requests with the service token`, async () => {
             const tokenRes = await _testServer.inject({
